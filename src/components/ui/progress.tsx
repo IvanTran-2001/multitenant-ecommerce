@@ -17,7 +17,7 @@ function Progress({
         "relative h-3 w-full overflow-hidden rounded-full",
 
         // Modify classes
-        "border bg-transparent",
+        "border bg-white",
         className
       )}
       {...props}

@@ -39,10 +39,10 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
                     ))}
 
                     <div className="border-t">
-                        <Link href="/sign-in" className={linkClassName}>
+                        <Link href="/sign-in" className={linkClassName} onClick={() => onOpenChange(false)}>
                             Login
                         </Link>
-                        <Link href="/sign-up" className={linkClassName}>
+                        <Link href="/sign-up" className={linkClassName} onClick={() => onOpenChange(false)}>
                             Start Selling
                         </Link>
 

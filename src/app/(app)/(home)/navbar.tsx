@@ -31,7 +31,7 @@ const NavbarItem = ({ href, children, isActive }: NavbarItemProps) => {
     );
 }
 
-const navbarItem = [
+const navbarItems = [
     { href: "/", children: "Home" },
     { href: "/about", children: "About" },
     { href: "/features", children: "Features" },
@@ -51,12 +51,12 @@ export const Navbar = () => {
             </Link>
 
             <NavbarSidebar
-                items={navbarItem}
+                items={navbarItems}
                 open={isSidebarOpen}
                 onOpenChange={setIsSidebarOpen} />
 
             <div className="items-center gap-4 hidden lg:flex">
-                {navbarItem.map((item) => (
+                {navbarItems.map((item) => (
                     <NavbarItem
                         key={item.href}
                         href={item.href}

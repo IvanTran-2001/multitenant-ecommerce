@@ -9,7 +9,9 @@ import sharp from 'sharp'
 import dns from 'dns'
 
 // Set Google DNS servers to fix DNS resolution issues
-dns.setServers(['8.8.8.8', '8.8.4.4'])
+if (process.env.PAYLOAD_FORCE_GOOGLE_DNS === 'true') {
+  dns.setServers(['8.8.8.8', '8.8.4.4'])
+}
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'

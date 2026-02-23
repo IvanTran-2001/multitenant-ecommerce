@@ -36,11 +36,17 @@ const withRetry = async <T>(operation: () => Promise<T>): Promise<T> => {
       await sleep(RETRY_DELAY_MS * attempt);
     }
   }
-
+  // Unreachable: loop always returns or throws, but TypeScript requires this
   throw lastError;
 };
+interface SeedCategory {
+  name: string;
+  slug: string;
+  color?: string;
+  subcategories?: { name: string; slug: string }[];
+}
 
-const categories = [
+const categories: SeedCategory[] = [
   {
     name: "All",
     slug: "all",

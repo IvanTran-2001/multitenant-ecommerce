@@ -3,13 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Category } from '@/payload-types';
 import React from 'react'
 import { useDropdownPosition } from './use-dropdown-positom';
 import { SubcategoryMenu } from './subcategory-menu';
+import { CustomCategory } from '../types';
+import Link from 'next/link';
 
 interface Props {
-    category: Category;
+    category: CustomCategory;
     isActive: boolean;
     isNavigationHovered: boolean;
 }
@@ -30,20 +31,30 @@ export const CategoryDropdown = ( { category, isActive, isNavigationHovered }: P
     }
 
     const dropDownPosition = getDropdownPosition();
-    
+
+    const toggleDropdown = () => {
+        if (category.subcategories.length) {
+            setIsOpen(!isOpen);
+        }
+    };
+
   return (
     <div className="relative" 
     ref={dropdownRef}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        onClick={toggleDropdown}
         >
         <div className="relative">
             <Button variant="elevated" className= {cn("h-11 px-4 bg-transparent border-transparent rounded-full hover:bg-white hover:border-primary text-black", 
-                isActive && !isNavigationHovered && "bg-white border-primary")
+                isActive && !isNavigationHovered && "bg-white border-primary", isOpen && "bg-white border-primary")
             }>
-                {category.name}
+                <Link 
+                href={`/${category.slug === "all" ? "" : category.slug}`}>{category.name}</Link>
             </Button>
             {category.subcategories && category.subcategories.length > 0 && (
+
+                //Creating the black Triangle
                 <div className={cn(
                     "opacity-0 absolute -bottom-3 w-0 h-0 border-l-10 border-r-10 border-b-10 border-l-transparent border-r-transparent border-b-black left-1/2 -translate-x-1/2",
                     isOpen && "opacity-100"

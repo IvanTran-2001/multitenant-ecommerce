@@ -2,13 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { CategoryDropdown } from './category-dropdown';
-import { CustomCategory } from '../types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ListFilterIcon } from 'lucide-react';
 import { CategoriesSidebar } from './categories-sidebar';
+import { CategoriesGetManyOutput } from '@/modules/categories/types';
 interface Props {
-    data: CustomCategory[];
+    data: CategoriesGetManyOutput;
 };
 
 export const Categories = ({ data }:Props) => {
@@ -61,10 +61,10 @@ export const Categories = ({ data }:Props) => {
   return (
     <div className='relative w-full'>
 
-        <CategoriesSidebar open={isSideBarOpen} onOpenChange={setIsSideBarOpen} data={data}/>
+        <CategoriesSidebar open={isSideBarOpen} onOpenChange={setIsSideBarOpen} />
         <div ref={MeasureRef} className='absolute opacity-0 pointer-events-none flex'
         style={{ position: "fixed", top: -9999, left: -9999 }}>
-            {data.map((category: CustomCategory) => (
+            {data.map((category: CategoriesGetManyOutput[1]) => (
             <div key={category.id}>
                 <CategoryDropdown
                 category={category}
@@ -80,7 +80,7 @@ export const Categories = ({ data }:Props) => {
         className="flex flex-nowrap items-center"
         onMouseEnter={() => setIsAnyHovered(true)}
         onMouseLeave={() => setIsAnyHovered(false)}>
-        {data.slice(0, visibleCount).map((category: CustomCategory) => (
+        {data.slice(0, visibleCount).map((category: CategoriesGetManyOutput[1]) => (
             <div key={category.id}>
                 <CategoryDropdown
                 category={category}

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 
 import { Poppins } from "next/font/google";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
     Form,
@@ -38,11 +38,13 @@ export const SignUpView = () => {
     const router = useRouter();
 
     const trcp = useTRPC();
+    const queryClient = useQueryClient();
     const register = useMutation(trcp.auth.register.mutationOptions({
         onError: (err) => {
             toast.error(err.message);
         },
-        onSuccess: () => {            
+        onSuccess: async () => {            
+            await queryClient.invalidateQueries(trcp.auth.session.queryFilter());
             toast.success("Account created successfully!");
             router.push("/");
         }

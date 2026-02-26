@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 
 import { Poppins } from "next/font/google";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
     Form,
@@ -37,11 +37,14 @@ export const SignInView = () => {
     const router = useRouter();
 
     const trcp = useTRPC();
+    const queryClient = useQueryClient();
+
     const login = useMutation(trcp.auth.login.mutationOptions({
         onError: (err) => {
             toast.error(err.message);
         },
-        onSuccess: () => {            
+        onSuccess: async () => {  
+            await queryClient.invalidateQueries(trcp.auth.session.queryFilter());          
             toast.success("Logged in successfully!");
             router.push("/");
         }

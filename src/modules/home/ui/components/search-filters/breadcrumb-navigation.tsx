@@ -17,7 +17,7 @@ interface Props {
   activeCategory: string | null;
 }
 
-export const BreadcrumNavigation = ({ activeCategoryName, activeSubcategoryName, activeCategory }: Props) => {
+export const BreadcrumbNavigation = ({ activeCategoryName, activeSubcategoryName, activeCategory }: Props) => {
 
   if (!activeCategoryName || activeCategory === "all") return null;
 

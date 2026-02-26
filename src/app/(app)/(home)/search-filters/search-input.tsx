@@ -27,7 +27,6 @@ export const SearchInput = ({ disabled, }: Props) => {
         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-neutral-500" />
         <Input className="pl-8" placeholder="Search products" disabled={disabled} />
       </div>
-      {/* TODO: Add categories view all button */}
       <Button
         variant="elevated"
         className="size-12 shrink-0 flex lg:hidden"
@@ -42,7 +41,7 @@ export const SearchInput = ({ disabled, }: Props) => {
           variant="elevated">
           <Link href="/library">
             <BookmarkCheckIcon />
-            Libary
+            Library
           </Link>
         </Button>
       )}

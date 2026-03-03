@@ -8,7 +8,7 @@ const ProductSort = () => {
     const [filters, setFilters] = useProductFilters();
 
   return (
-    <div className='flex item-center gap-2'>
+    <div className='flex items-center gap-2'>
         <Button size="sm"
         className={cn("rounded-full bg-white hover:bg-white", 
         filters.sort !== "curated" && "bg-transparent border-transparent hover:border-border hover:bg-transparent")}

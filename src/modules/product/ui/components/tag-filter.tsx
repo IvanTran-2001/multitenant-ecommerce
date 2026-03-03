@@ -50,6 +50,7 @@ const TagFilter = ({ value, onChange }: Props) => {
               onClick={() => onClick(tag.name)}>
               <p className='font-medium'>{tag.name}</p>
               <Checkbox checked={value?.includes(tag.name) || false}
+                onClick={(e) => e.stopPropagation()}
                 onCheckedChange={() => onClick(tag.name)}
               />
 

@@ -1,6 +1,5 @@
 "use client";
 
-import React from 'react'
 import { SearchInput } from './search-input';
 import { Categories } from './categories';
 // import { CustomCategory } from '../types';

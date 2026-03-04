@@ -11,7 +11,7 @@
     "generate:types": "payload generate:types",
     "db:fresh": "payload migrate:fresh",
     "db:seed": "bun run src/seed.ts",
-    "db:reset": "bun run db:fresh && bun -e \"await Bun.sleep(1500)\" && bun run db:seed"
+    "db:reset": "bun run db:fresh && bun -e \"await Bun.sleep(5000)\" && bun run db:seed"
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",

@@ -93,7 +93,7 @@ export const SignUpView = () => {
                             </Button>
                         </div>
                         <h1 className="text-4xl font-medium">
-                            Join over 1000 creators earning money on funroad    
+                            Join over X creators earning money on funroad    
                         </h1>
                         <FormField
                         name="username"
@@ -155,7 +155,6 @@ export const SignUpView = () => {
                 backgroundSize: "cover",
                 backgroundPosition: "center"
             }}>
-                Background column
             </div>
 
         </div>

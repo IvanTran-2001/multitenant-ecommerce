@@ -15,7 +15,7 @@ export const SubcategoryMenu = ( { category, isOpen }: Props ) => {
     const backgroundColor = category.color || "#F5F5F5";
 
     return (
-        <div className="absolute z-100" style={{ top: "100%", left: 0 }}>
+        <div className="absolute z-100, top=full left-0">
 
             <div className="h-3 w-60"/>
             <div 

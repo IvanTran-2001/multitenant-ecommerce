@@ -1,4 +1,3 @@
-
 import { Footer } from "@/modules/tenants/ui/components/Footer";
 import { Navbar, NavbarSkeleton } from "@/modules/tenants/ui/components/navbar";
 import { getQueryClient, trpc } from "@/trpc/server";
@@ -13,25 +12,25 @@ const Layout = async ({ children, params }: Props) => {
   const { slug } = await params;
 
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(trpc.tenants.getOne.queryOptions({
-    slug,
-  }));
+  await queryClient.prefetchQuery(
+    trpc.tenants.getOne.queryOptions({
+      slug,
+    }),
+  );
 
   return (
-    <div className='min-h-screen bg-[#F4F4F0] flex flex-col'>
+    <div className="min-h-screen bg-[#F4F4F0] flex flex-col">
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<NavbarSkeleton />}>
-          <Navbar slug={ slug }/>
+          <Navbar slug={slug} />
         </Suspense>
       </HydrationBoundary>
       <div className="flex-1">
-        <div className="max-w-(--breakpoint-xl) mx-auto">
-          {children}
-        </div>
+        <div className="max-w-(--breakpoint-xl) mx-auto">{children}</div>
       </div>
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const FeaturesPage = () => {
-  return (
-    <div>Features Page</div>
-  )
-}
+  return <div>Features Page</div>;
+};
 
-export default FeaturesPage
+export default FeaturesPage;

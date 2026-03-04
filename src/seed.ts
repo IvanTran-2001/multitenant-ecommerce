@@ -182,18 +182,42 @@ const categories: SeedCategory[] = [
       { name: "Macro", slug: "macro" },
     ],
   },
-]
+];
 
 const tagNames = [
-  "beginner", "advanced", "intermediate", "free", "premium",
-  "video", "ebook", "template", "bundle", "course",
-  "trending", "new", "bestseller", "popular", "featured",
+  "beginner",
+  "advanced",
+  "intermediate",
+  "free",
+  "premium",
+  "video",
+  "ebook",
+  "template",
+  "bundle",
+  "course",
+  "trending",
+  "new",
+  "bestseller",
+  "popular",
+  "featured",
 ];
 
 const productTemplates = [
-  (name: string) => ({ name: `${name} Fundamentals`, price: 19, description: `A complete introduction to ${name}.` }),
-  (name: string) => ({ name: `${name} Masterclass`, price: 49, description: `Take your ${name} skills to the next level.` }),
-  (name: string) => ({ name: `${name} Essentials`, price: 29, description: `Everything you need to know about ${name}.` }),
+  (name: string) => ({
+    name: `${name} Fundamentals`,
+    price: 19,
+    description: `A complete introduction to ${name}.`,
+  }),
+  (name: string) => ({
+    name: `${name} Masterclass`,
+    price: 49,
+    description: `Take your ${name} skills to the next level.`,
+  }),
+  (name: string) => ({
+    name: `${name} Essentials`,
+    price: 29,
+    description: `Everything you need to know about ${name}.`,
+  }),
 ];
 
 const uploadLocalMedia = async (
@@ -218,7 +242,7 @@ const uploadLocalMedia = async (
       data: { alt },
       file: { data, name, mimetype, size: data.length },
       disableTransaction: true,
-    })
+    }),
   );
 };
 
@@ -237,12 +261,16 @@ const fetchAndUploadMedia = async (
       data: { alt },
       file: { data: buffer, name, mimetype, size: buffer.length },
       disableTransaction: true,
-    })
+    }),
   );
 };
 
 const extraAccounts = [
-  { email: "marcus@demo.com", username: "marcus", storeName: "Marcus Creative" },
+  {
+    email: "marcus@demo.com",
+    username: "marcus",
+    storeName: "Marcus Creative",
+  },
   { email: "priya@demo.com", username: "priya", storeName: "Priya Digital" },
 ];
 
@@ -259,14 +287,26 @@ const seed = async () => {
         roles: ["super-admin"],
       },
       disableTransaction: true,
-    })
+    }),
   );
 
   const profileDir = path.resolve("public/profile");
   const profileImages = [
-    await uploadLocalMedia(payload, path.join(profileDir, "profile1.avif"), "Admin profile picture"),
-    await uploadLocalMedia(payload, path.join(profileDir, "profile2.jpg"), "Marcus profile picture"),
-    await uploadLocalMedia(payload, path.join(profileDir, "profile1.avif"), "Priya profile picture"),
+    await uploadLocalMedia(
+      payload,
+      path.join(profileDir, "profile1.avif"),
+      "Admin profile picture",
+    ),
+    await uploadLocalMedia(
+      payload,
+      path.join(profileDir, "profile2.jpg"),
+      "Marcus profile picture",
+    ),
+    await uploadLocalMedia(
+      payload,
+      path.join(profileDir, "profile1.avif"),
+      "Priya profile picture",
+    ),
   ];
 
   const adminTenant = await withRetry(() =>
@@ -280,7 +320,7 @@ const seed = async () => {
         image: profileImages[0]!.id,
       },
       disableTransaction: true,
-    })
+    }),
   );
 
   await withRetry(() =>
@@ -289,7 +329,7 @@ const seed = async () => {
       id: adminUser.id,
       data: { tenants: [{ tenant: adminTenant.id }] },
       disableTransaction: true,
-    })
+    }),
   );
 
   const extraTenants: { id: string }[] = [];
@@ -305,7 +345,7 @@ const seed = async () => {
           roles: ["user"],
         },
         disableTransaction: true,
-      })
+      }),
     );
 
     const tenant = await withRetry(() =>
@@ -319,7 +359,7 @@ const seed = async () => {
           image: profileImages[i + 1]?.id ?? profileImages[0]!.id,
         },
         disableTransaction: true,
-      })
+      }),
     );
 
     await withRetry(() =>
@@ -328,7 +368,7 @@ const seed = async () => {
         id: user.id,
         data: { tenants: [{ tenant: tenant.id }] },
         disableTransaction: true,
-      })
+      }),
     );
 
     extraTenants.push({ id: tenant.id });
@@ -339,13 +379,19 @@ const seed = async () => {
 
   // Pre-fetch 9 product placeholder images
   console.log("Fetching product placeholder images...");
-  const productImageURLs = Array.from({ length: 9 }, (_, i) =>
-    `https://picsum.photos/seed/product${i + 1}/400/400`
+  const productImageURLs = Array.from(
+    { length: 9 },
+    (_, i) => `https://picsum.photos/seed/product${i + 1}/400/400`,
   );
   const productImages = await Promise.all(
     productImageURLs.map((url, i) =>
-      fetchAndUploadMedia(payload, url, `product-placeholder-${i + 1}.jpg`, `Product image ${i + 1}`)
-    )
+      fetchAndUploadMedia(
+        payload,
+        url,
+        `product-placeholder-${i + 1}.jpg`,
+        `Product image ${i + 1}`,
+      ),
+    ),
   );
 
   // Seed tags
@@ -357,7 +403,7 @@ const seed = async () => {
         where: { name: { equals: tagName } },
         limit: 1,
         pagination: false,
-      })
+      }),
     );
     const existingTag = existing.docs.at(0);
     if (existingTag?.id) {
@@ -368,7 +414,7 @@ const seed = async () => {
           collection: "tags",
           data: { name: tagName },
           disableTransaction: true,
-        })
+        }),
       );
       seededTags.push({ id: created.id });
     }
@@ -387,7 +433,7 @@ const seed = async () => {
         },
         limit: 1,
         pagination: false,
-      })
+      }),
     );
     const existingParentDoc = existingParent.docs.at(0);
 
@@ -405,14 +451,14 @@ const seed = async () => {
             id: existingParentDoc.id,
             data: parentData,
             disableTransaction: true,
-          })
+          }),
         )
       : await withRetry(() =>
           payload.create({
             collection: "categories",
             data: parentData,
             disableTransaction: true,
-          })
+          }),
         );
 
     for (const subCategory of category.subcategories || []) {
@@ -426,7 +472,7 @@ const seed = async () => {
           },
           limit: 1,
           pagination: false,
-        })
+        }),
       );
       const existingChildDoc = existingChild.docs.at(0);
 
@@ -443,9 +489,12 @@ const seed = async () => {
             id: existingChildDoc.id,
             data: childData,
             disableTransaction: true,
-          })
+          }),
         );
-        seededSubcategories.push({ id: existingChildDoc.id, name: subCategory.name });
+        seededSubcategories.push({
+          id: existingChildDoc.id,
+          name: subCategory.name,
+        });
         continue;
       }
 
@@ -454,7 +503,7 @@ const seed = async () => {
           collection: "categories",
           data: childData,
           disableTransaction: true,
-        })
+        }),
       );
       seededSubcategories.push({ id: createdChild.id, name: subCategory.name });
     }
@@ -464,7 +513,9 @@ const seed = async () => {
   for (const subcategory of seededSubcategories) {
     for (const template of productTemplates.map((fn) => fn(subcategory.name))) {
       const shuffled = [...seededTags].sort(() => Math.random() - 0.5);
-      const assignedTags = shuffled.slice(0, 2 + Math.floor(Math.random() * 2)).map((t) => t.id);
+      const assignedTags = shuffled
+        .slice(0, 2 + Math.floor(Math.random() * 2))
+        .map((t) => t.id);
       const assignedTenant = allTenants[productIndex % allTenants.length]!;
       const assignedImage = productImages[productIndex % productImages.length]!;
       productIndex++;
@@ -481,7 +532,7 @@ const seed = async () => {
             image: assignedImage.id,
           },
           disableTransaction: true,
-        })
+        }),
       );
     }
   }

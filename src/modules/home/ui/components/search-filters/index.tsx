@@ -1,20 +1,19 @@
 "use client";
 
-import { SearchInput } from './search-input';
-import { Categories } from './categories';
+import { SearchInput } from "./search-input";
+import { Categories } from "./categories";
 // import { CustomCategory } from '../types';
-import { useTRPC } from '@/trpc/client';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
-import { DEFAULT_BG_COLOR } from '../../../constants';
-import { BreadcrumbNavigation } from './breadcrumb-navigation';
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { DEFAULT_BG_COLOR } from "../../../constants";
+import { BreadcrumbNavigation } from "./breadcrumb-navigation";
 
 // interface Props {
 //     data: CustomCategory[];
 // };
 
 export const SearchFilters = () => {
-
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.categories.getMany.queryOptions());
 
@@ -28,10 +27,16 @@ export const SearchFilters = () => {
   const activeCategoryName = activeCategoryData?.name || null;
 
   const activeSubcategory = params.subcategory as string | undefined;
-  const activeSubcategoryName = activeCategoryData?.subcategories?.find((sub) => sub.slug === activeSubcategory)?.name || null;
+  const activeSubcategoryName =
+    activeCategoryData?.subcategories?.find(
+      (sub) => sub.slug === activeSubcategory,
+    )?.name || null;
 
   return (
-    <div className="px-4 lg:px-12 py-8 border-b flex flex-col gap-4 w-full" style={{ backgroundColor: activeCategoryColor }}>
+    <div
+      className="px-4 lg:px-12 py-8 border-b flex flex-col gap-4 w-full"
+      style={{ backgroundColor: activeCategoryColor }}
+    >
       <SearchInput />
       <div className="hidden lg:block">
         <Categories data={data} />
@@ -47,13 +52,16 @@ export const SearchFilters = () => {
 
 export const SearchFiltersLoading = () => {
   return (
-    <div className="px-4 lg:px-12 py-8 border-b flex flex-col gap-4 w-full" style={{
-      backgroundColor: DEFAULT_BG_COLOR,
-    }}>
+    <div
+      className="px-4 lg:px-12 py-8 border-b flex flex-col gap-4 w-full"
+      style={{
+        backgroundColor: DEFAULT_BG_COLOR,
+      }}
+    >
       <SearchInput disabled={true} />
       <div className="hidden lg:block">
-        <div className='h-11' />
+        <div className="h-11" />
       </div>
     </div>
-  )
-}
+  );
+};

@@ -18,6 +18,8 @@ import { Media } from './collections/Media'
 import { Categories } from './collections/Categories'
 import { Products } from './collections/Products'
 import { Tags } from './collections/Tags'
+import { Tenants } from './collections/Tenants'
+import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -29,7 +31,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Categories, Products, Tags],
+  collections: [Users, Media, Categories, Products, Tags, Tenants],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -41,6 +43,32 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
+    multiTenantPlugin({
+      collections: {
+        products: {},
+      },
+      tenantsArrayField: {
+        includeDefaultField: false,
+      },
+      userHasAccessToAllTenants: (user) => Boolean(user?.roles?.includes('super-admin')), 
+
+    }),
+
+//     multiTenantPlugin({
+//   collections: {
+//     products: {},
+//   },
+//   tenantsArrayField: {
+//     includeDefaultField: false,
+//   },
+//   userHasAccessToAllTenants: (user) =>
+//     Boolean(
+//       user &&
+//       'roles' in user &&
+//       Array.isArray(user.roles) &&
+//       user.roles.includes('super-admin')
+//     ),
+// }),
     // storage-adapter-placeholder
   ],
 })

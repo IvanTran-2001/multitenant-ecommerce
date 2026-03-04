@@ -1,5 +1,7 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
+import fs from "fs";
+import path from "path";
 
 const RETRY_ATTEMPTS = 5;
 const RETRY_DELAY_MS = 150;
@@ -182,18 +184,197 @@ const categories: SeedCategory[] = [
   },
 ]
 
+const tagNames = [
+  "beginner", "advanced", "intermediate", "free", "premium",
+  "video", "ebook", "template", "bundle", "course",
+  "trending", "new", "bestseller", "popular", "featured",
+];
+
+const productTemplates = [
+  (name: string) => ({ name: `${name} Fundamentals`, price: 19, description: `A complete introduction to ${name}.` }),
+  (name: string) => ({ name: `${name} Masterclass`, price: 49, description: `Take your ${name} skills to the next level.` }),
+  (name: string) => ({ name: `${name} Essentials`, price: 29, description: `Everything you need to know about ${name}.` }),
+];
+
+const uploadLocalMedia = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  filePath: string,
+  alt: string,
+) => {
+  const data = fs.readFileSync(filePath);
+  const name = path.basename(filePath);
+  const ext = path.extname(name).toLowerCase();
+  const mimeMap: Record<string, string> = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".avif": "image/avif",
+    ".webp": "image/webp",
+  };
+  const mimetype = mimeMap[ext] ?? "image/jpeg";
+  return withRetry(() =>
+    payload.create({
+      collection: "media",
+      data: { alt },
+      file: { data, name, mimetype, size: data.length },
+      disableTransaction: true,
+    })
+  );
+};
+
+const fetchAndUploadMedia = async (
+  payload: Awaited<ReturnType<typeof getPayload>>,
+  url: string,
+  name: string,
+  alt: string,
+) => {
+  const res = await fetch(url);
+  const buffer = Buffer.from(await res.arrayBuffer());
+  const mimetype = res.headers.get("content-type") ?? "image/jpeg";
+  return withRetry(() =>
+    payload.create({
+      collection: "media",
+      data: { alt },
+      file: { data: buffer, name, mimetype, size: buffer.length },
+      disableTransaction: true,
+    })
+  );
+};
+
+const extraAccounts = [
+  { email: "marcus@demo.com", username: "marcus", storeName: "Marcus Creative" },
+  { email: "priya@demo.com", username: "priya", storeName: "Priya Digital" },
+];
+
 const seed = async () => {
   const payload = await getPayload({ config });
 
-  await payload.create({
-    collection: "users",
-    data: {
-      email: "admin@demo.com",
-      username: "admin",
-      password: "password",
-      roles: ["super-admin"],
+  const adminUser = await withRetry(() =>
+    payload.create({
+      collection: "users",
+      data: {
+        email: "admin@demo.com",
+        username: "admin",
+        password: "password",
+        roles: ["super-admin"],
+      },
+      disableTransaction: true,
+    })
+  );
+
+  const profileDir = path.resolve("public/profile");
+  const profileImages = [
+    await uploadLocalMedia(payload, path.join(profileDir, "profile1.avif"), "Admin profile picture"),
+    await uploadLocalMedia(payload, path.join(profileDir, "profile2.jpg"), "Marcus profile picture"),
+    await uploadLocalMedia(payload, path.join(profileDir, "profile1.avif"), "Priya profile picture"),
+  ];
+
+  const adminTenant = await withRetry(() =>
+    payload.create({
+      collection: "tenants",
+      draft: false,
+      data: {
+        name: "Demo Store",
+        slug: "admin",
+        stripeAccountId: "mock",
+        image: profileImages[0]!.id,
+      },
+      disableTransaction: true,
+    })
+  );
+
+  await withRetry(() =>
+    payload.update({
+      collection: "users",
+      id: adminUser.id,
+      data: { tenants: [{ tenant: adminTenant.id }] },
+      disableTransaction: true,
+    })
+  );
+
+  const extraTenants: { id: string }[] = [];
+  for (let i = 0; i < extraAccounts.length; i++) {
+    const account = extraAccounts[i]!;
+    const user = await withRetry(() =>
+      payload.create({
+        collection: "users",
+        data: {
+          email: account.email,
+          username: account.username,
+          password: "password",
+          roles: ["user"],
+        },
+        disableTransaction: true,
+      })
+    );
+
+    const tenant = await withRetry(() =>
+      payload.create({
+        collection: "tenants",
+        draft: false,
+        data: {
+          name: account.storeName,
+          slug: account.username,
+          stripeAccountId: "mock",
+          image: profileImages[i + 1]?.id ?? profileImages[0]!.id,
+        },
+        disableTransaction: true,
+      })
+    );
+
+    await withRetry(() =>
+      payload.update({
+        collection: "users",
+        id: user.id,
+        data: { tenants: [{ tenant: tenant.id }] },
+        disableTransaction: true,
+      })
+    );
+
+    extraTenants.push({ id: tenant.id });
+  }
+
+  // All tenants in round-robin order: admin, marcus, priya
+  const allTenants = [{ id: adminTenant.id }, ...extraTenants];
+
+  // Pre-fetch 9 product placeholder images
+  console.log("Fetching product placeholder images...");
+  const productImageURLs = Array.from({ length: 9 }, (_, i) =>
+    `https://picsum.photos/seed/product${i + 1}/400/400`
+  );
+  const productImages = await Promise.all(
+    productImageURLs.map((url, i) =>
+      fetchAndUploadMedia(payload, url, `product-placeholder-${i + 1}.jpg`, `Product image ${i + 1}`)
+    )
+  );
+
+  // Seed tags
+  const seededTags: { id: string }[] = [];
+  for (const tagName of tagNames) {
+    const existing = await withRetry(() =>
+      payload.find({
+        collection: "tags",
+        where: { name: { equals: tagName } },
+        limit: 1,
+        pagination: false,
+      })
+    );
+    const existingTag = existing.docs.at(0);
+    if (existingTag?.id) {
+      seededTags.push({ id: existingTag.id });
+    } else {
+      const created = await withRetry(() =>
+        payload.create({
+          collection: "tags",
+          data: { name: tagName },
+          disableTransaction: true,
+        })
+      );
+      seededTags.push({ id: created.id });
     }
-  });
+  }
+
+  const seededSubcategories: { id: string; name: string }[] = [];
 
   for (const category of categories) {
     const existingParent = await withRetry(() =>
@@ -208,6 +389,7 @@ const seed = async () => {
         pagination: false,
       })
     );
+    const existingParentDoc = existingParent.docs.at(0);
 
     const parentData = {
       name: category.name,
@@ -216,11 +398,11 @@ const seed = async () => {
       parent: null,
     };
 
-    const parentCategory = existingParent.docs[0]
+    const parentCategory = existingParentDoc?.id
       ? await withRetry(() =>
           payload.update({
             collection: "categories",
-            id: existingParent.docs[0].id,
+            id: existingParentDoc.id,
             data: parentData,
             disableTransaction: true,
           })
@@ -246,6 +428,7 @@ const seed = async () => {
           pagination: false,
         })
       );
+      const existingChildDoc = existingChild.docs.at(0);
 
       const childData = {
         name: subCategory.name,
@@ -253,23 +436,50 @@ const seed = async () => {
         parent: parentCategory.id,
       };
 
-      if (existingChild.docs[0]) {
+      if (existingChildDoc?.id) {
         await withRetry(() =>
           payload.update({
             collection: "categories",
-            id: existingChild.docs[0].id,
+            id: existingChildDoc.id,
             data: childData,
             disableTransaction: true,
           })
         );
-
+        seededSubcategories.push({ id: existingChildDoc.id, name: subCategory.name });
         continue;
       }
 
-      await withRetry(() =>
+      const createdChild = await withRetry(() =>
         payload.create({
           collection: "categories",
           data: childData,
+          disableTransaction: true,
+        })
+      );
+      seededSubcategories.push({ id: createdChild.id, name: subCategory.name });
+    }
+  }
+
+  let productIndex = 0;
+  for (const subcategory of seededSubcategories) {
+    for (const template of productTemplates.map((fn) => fn(subcategory.name))) {
+      const shuffled = [...seededTags].sort(() => Math.random() - 0.5);
+      const assignedTags = shuffled.slice(0, 2 + Math.floor(Math.random() * 2)).map((t) => t.id);
+      const assignedTenant = allTenants[productIndex % allTenants.length]!;
+      const assignedImage = productImages[productIndex % productImages.length]!;
+      productIndex++;
+
+      await withRetry(() =>
+        payload.create({
+          collection: "products",
+          data: {
+            ...template,
+            category: subcategory.id,
+            tenant: assignedTenant.id,
+            refundPolicy: "30-day",
+            tags: assignedTags,
+            image: assignedImage.id,
+          },
           disableTransaction: true,
         })
       );

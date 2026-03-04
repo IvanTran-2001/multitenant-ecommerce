@@ -32,7 +32,6 @@ export const Products: CollectionConfig = {
             name: "tags",
             type: "relationship",
             relationTo: "tags",
-            required: true,
             hasMany: true,
         },
         {

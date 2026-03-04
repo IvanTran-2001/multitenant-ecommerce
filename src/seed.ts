@@ -185,6 +185,16 @@ const categories: SeedCategory[] = [
 const seed = async () => {
   const payload = await getPayload({ config });
 
+  await payload.create({
+    collection: "users",
+    data: {
+      email: "admin@demo.com",
+      username: "admin",
+      password: "password",
+      roles: ["super-admin"],
+    }
+  });
+
   for (const category of categories) {
     const existingParent = await withRetry(() =>
       payload.find({

@@ -208,6 +208,7 @@ const seed = async () => {
         pagination: false,
       })
     );
+    const existingParentDoc = existingParent.docs.at(0);
 
     const parentData = {
       name: category.name,
@@ -216,11 +217,11 @@ const seed = async () => {
       parent: null,
     };
 
-    const parentCategory = existingParent.docs[0]
+    const parentCategory = existingParentDoc?.id
       ? await withRetry(() =>
           payload.update({
             collection: "categories",
-            id: existingParent.docs[0].id,
+            id: existingParentDoc.id,
             data: parentData,
             disableTransaction: true,
           })
@@ -246,6 +247,7 @@ const seed = async () => {
           pagination: false,
         })
       );
+      const existingChildDoc = existingChild.docs.at(0);
 
       const childData = {
         name: subCategory.name,
@@ -253,11 +255,11 @@ const seed = async () => {
         parent: parentCategory.id,
       };
 
-      if (existingChild.docs[0]) {
+      if (existingChildDoc?.id) {
         await withRetry(() =>
           payload.update({
             collection: "categories",
-            id: existingChild.docs[0].id,
+            id: existingChildDoc.id,
             data: childData,
             disableTransaction: true,
           })

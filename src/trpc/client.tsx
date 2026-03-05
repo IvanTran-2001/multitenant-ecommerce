@@ -1,20 +1,23 @@
-'use client';
+"use client";
 // ^-- to make sure we can mount the Provider from a server component
-import superJSON from 'superjson';
-import type { QueryClient } from '@tanstack/react-query';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { createTRPCContext } from '@trpc/tanstack-react-query';
-import { useState } from 'react';
-import { makeQueryClient } from './query-client';
-import type { AppRouter } from './routers/_app';
+import superJSON from "superjson";
+import type { QueryClient } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { createTRPCContext } from "@trpc/tanstack-react-query";
+import { useState } from "react";
+import { makeQueryClient } from "./query-client";
+import type { AppRouter } from "./routers/_app";
 
-export const { TRPCProvider: TRPCContextProvider, useTRPC, useTRPCClient } =
-  createTRPCContext<AppRouter>();
+export const {
+  TRPCProvider: TRPCContextProvider,
+  useTRPC,
+  useTRPCClient,
+} = createTRPCContext<AppRouter>();
 
 let clientQueryClientSingleton: QueryClient;
 function getQueryClient() {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     // Server: always make a new query client
     return makeQueryClient();
   }
@@ -23,7 +26,7 @@ function getQueryClient() {
 }
 function getUrl() {
   const base = (() => {
-    if (typeof window !== 'undefined') return '';
+    if (typeof window !== "undefined") return "";
     return process.env.NET_PUBLIC_APP_URL;
   })();
   return `${base}/api/trpc`;

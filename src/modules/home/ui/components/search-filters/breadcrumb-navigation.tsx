@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 
 import {
   Breadcrumb,
@@ -7,9 +7,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-}
-  from '@/components/ui/breadcrumb'
-import Link from 'next/link';
+} from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 interface Props {
   activeCategoryName: string | null;
@@ -17,39 +16,45 @@ interface Props {
   activeCategory: string | null;
 }
 
-export const BreadcrumbNavigation = ({ activeCategoryName, activeSubcategoryName, activeCategory }: Props) => {
-
+export const BreadcrumbNavigation = ({
+  activeCategoryName,
+  activeSubcategoryName,
+  activeCategory,
+}: Props) => {
   if (!activeCategoryName || activeCategory === "all") return null;
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-      {activeSubcategoryName ? (
-        <>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild className='text-xl font-medium underline text-primary'>
-              <Link href={`/${activeCategory}`}> { activeCategoryName } </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
+        {activeSubcategoryName ? (
+          <>
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                asChild
+                className="text-xl font-medium underline text-primary"
+              >
+                <Link href={`/${activeCategory}`}> {activeCategoryName} </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
 
-          <BreadcrumbSeparator className='text-primary font-medium text-lg'>
-          /
-          </BreadcrumbSeparator>
+            <BreadcrumbSeparator className="text-primary font-medium text-lg">
+              /
+            </BreadcrumbSeparator>
 
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-xl font-medium">
+                {activeSubcategoryName}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </>
+        ) : (
           <BreadcrumbItem>
-            <BreadcrumbPage className='text-xl font-medium'>
-              { activeSubcategoryName } 
+            <BreadcrumbPage className="text-xl font-medium">
+              {activeCategoryName}
             </BreadcrumbPage>
           </BreadcrumbItem>
-        </>
-      ) : (
-        <BreadcrumbItem>
-            <BreadcrumbPage className='text-xl font-medium'>
-              { activeCategoryName } 
-            </BreadcrumbPage>
-          </BreadcrumbItem>
-      )}
+        )}
       </BreadcrumbList>
     </Breadcrumb>
-  )
-}
+  );
+};

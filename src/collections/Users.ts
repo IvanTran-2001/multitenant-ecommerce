@@ -1,10 +1,10 @@
-import type { CollectionConfig } from 'payload'
-import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields'
+import type { CollectionConfig } from "payload";
+import { tenantsArrayField } from "@payloadcms/plugin-multi-tenant/fields";
 
 const defaultTenantArrayField = tenantsArrayField({
-  tenantsArrayFieldName: 'tenants',
-  tenantsCollectionSlug: 'tenants',
-  tenantsArrayTenantFieldName: 'tenant',
+  tenantsArrayFieldName: "tenants",
+  tenantsCollectionSlug: "tenants",
+  tenantsArrayTenantFieldName: "tenant",
   arrayFieldAccess: {
     read: () => true,
     update: () => true,
@@ -15,28 +15,28 @@ const defaultTenantArrayField = tenantsArrayField({
     update: () => true,
     create: () => true,
   },
-})
+});
 
 export const Users: CollectionConfig = {
-  slug: 'users',
+  slug: "users",
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: "email",
   },
   auth: true,
   fields: [
     {
-      name: 'username',
-      type: 'text',
+      name: "username",
+      type: "text",
       required: true,
       unique: true,
     },
     {
       admin: {
-        position: 'sidebar',
+        position: "sidebar",
       },
-      name: 'roles',
-      type: 'select',
-      defaultValue: ['user'],
+      name: "roles",
+      type: "select",
+      defaultValue: ["user"],
       hasMany: true,
       options: ["super-admin", "user"],
     },
@@ -44,8 +44,8 @@ export const Users: CollectionConfig = {
       ...defaultTenantArrayField,
       admin: {
         ...(defaultTenantArrayField.admin || {}),
-        position: 'sidebar',
+        position: "sidebar",
       },
     },
   ],
-}
+};
